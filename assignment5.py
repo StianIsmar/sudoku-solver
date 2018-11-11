@@ -2,6 +2,7 @@
 
 import copy
 import itertools
+import os
 
 class CSP:
     def __init__(self):
@@ -128,6 +129,12 @@ class CSP:
         is the initial queue of arcs that should be visited.
         """
         # TODO: IMPLEMENT THIS
+
+        # Skal returnere true om den er konsistent (
+        # while len(queue) > 0:
+
+
+
         pass
 
     def revise(self, assignment, i, j):
@@ -139,7 +146,25 @@ class CSP:
         between i and j, the value should be deleted from i's list of
         legal values in 'assignment'.
         """
-        # TODO: IMPLEMENT THIS
+        # TODO: IMPLEMENT THIS:
+        revised = 'true'
+        possible_value_pairs = list(assignment.constraints[i][j])
+        iteration = 1
+        for x in assignment.domains[i]:
+            for y in assignment.domains[j]:
+                for pair in possible_value_pairs:
+                    if (x, y) == pair or (y, x) == pair and x !=y:
+                        print("x,y: pair", x,y,pair)
+                        revised = 'false'
+                    # If the condition above has not bee true yet, we have no matching pair and the x must be removed:
+                    if revised =='true':
+                        print(assignment.domains[i].remove(x))
+
+        return revised
+
+
+
+        # Dette er alle de mulige kombinasjonene for verdiene til variabel i og j:
         pass
 
 def create_map_coloring_csp():
@@ -157,6 +182,14 @@ def create_map_coloring_csp():
         for other_state in other_states:
             csp.add_constraint_one_way(state, other_state, lambda i, j: i != j)
             csp.add_constraint_one_way(other_state, state, lambda i, j: i != j)
+    print(csp.variables)
+    print("******* Domains: ")
+    print(csp.domains['T'])
+    print("******* Constraints: ")
+    #Verdiene NSW og Queensland kan ha:
+    print(list(csp.constraints['NSW']['Q']))
+    print(csp.revise(csp, 'WA','SA'))
+
     return csp
 
 def create_sudoku_csp(filename):
@@ -165,7 +198,7 @@ def create_sudoku_csp(filename):
     """
     csp = CSP()
     board = map(lambda x: x.strip(), open(filename, 'r'))
-
+    board = list(board)
     for row in range(9):
         for col in range(9):
             if board[row][col] == '0':
@@ -185,6 +218,8 @@ def create_sudoku_csp(filename):
                     cells.append('%d-%d' % (row, col))
             csp.add_all_different_constraint(cells)
 
+
+            #My coding:
     return csp
 
 def print_sudoku_solution(solution):
@@ -194,9 +229,19 @@ def print_sudoku_solution(solution):
     """
     for row in range(9):
         for col in range(9):
-            print solution['%d-%d' % (row, col)][0],
+            print(solution['%d-%d' % (row, col)][0])
             if col == 2 or col == 5:
-                print '|',
-        print
-        if row == 2 or row == 5:
-            print '------+-------+------'
+                print('|'),
+            print()
+            if row == 2 or row == 5:
+                print('------+-------+------')
+
+
+## Main ##
+# fileDir = os.path.dirname(os.path.realpath('__file__'))
+# print(fileDir)
+# filename = os.path.join(fileDir, 'sudokus/easy.txt')
+# Returns CPS from board:
+# create_sudoku_csp(filename)
+#Returns CSP for map coloring:
+map_csp = create_map_coloring_csp()
