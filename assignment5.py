@@ -129,14 +129,28 @@ class CSP:
         is the initial queue of arcs that should be visited.
         """
         # TODO: IMPLEMENT THIS
+        #The queue is initially a queue of all the arcs in the csp.
+        while len(queue) > 0:
+            arc = queue.pop(0)
+            if self.revise(assignment, arc[0], arc[1]):
+                if len(assignment.domain[(arc[0])]) == 0:
+                    return 'false'
+                for neighbour_variable in assignment.get_all_neighboring_arcs(arc[0]):
+                    if neighbour_variable != arc[1]:
+                        queue.append((neighbour_variable, arc[0]))
+        return 'true'
 
-        # Skal returnere true om den er konsistent (
+
+
+
+        # Skal returnere true om den er ky
+        # onsistent (
         # while len(queue) > 0:
 
 
 
         pass
-
+    #Hvis denne er true ble det slettet verdier fra i sitt domain!
     def revise(self, assignment, i, j):
         """The function 'Revise' from the pseudocode in the textbook.
         'assignment' is the current partial assignment, that contains
@@ -148,24 +162,19 @@ class CSP:
         """
         # TODO: IMPLEMENT THIS:
         revised = 'true'
+        # A list of the possible value pairs on the form: [('blue','red'), ('red','blue')]
         possible_value_pairs = list(assignment.constraints[i][j])
-        iteration = 1
         for x in assignment.domains[i]:
             for y in assignment.domains[j]:
                 for pair in possible_value_pairs:
-                    if (x, y) == pair or (y, x) == pair and x !=y:
-                        print("x,y: pair", x,y,pair)
+                    if (x, y) == pair or (y, x) == pair and x != y:
+                        print("x: ", x, "y: ", y, "pair: ", pair)
                         revised = 'false'
-                    # If the condition above has not bee true yet, we have no matching pair and the x must be removed:
-                    if revised =='true':
-                        print(assignment.domains[i].remove(x))
-
+            # If revised is still true, x has to be removed from i's domain!:
+            if revised == 'true':
+                print("x is removed from assignment.domains[i]!")
+                assignment.domains[i].remove(x)
         return revised
-
-
-
-        # Dette er alle de mulige kombinasjonene for verdiene til variabel i og j:
-        pass
 
 def create_map_coloring_csp():
     """Instantiate a CSP representing the map coloring problem from the
@@ -184,11 +193,12 @@ def create_map_coloring_csp():
             csp.add_constraint_one_way(other_state, state, lambda i, j: i != j)
     print(csp.variables)
     print("******* Domains: ")
-    print(csp.domains['T'])
+    print(len(csp.domains['T']), "Domain for Tassie")
     print("******* Constraints: ")
     #Verdiene NSW og Queensland kan ha:
     print(list(csp.constraints['NSW']['Q']))
-    print(csp.revise(csp, 'WA','SA'))
+    print(csp.revise(csp, 'WA', 'SA'))
+    print(csp.get_all_arcs(), "All arcs")
 
     return csp
 
